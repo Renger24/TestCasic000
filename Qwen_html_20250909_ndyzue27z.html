@@ -13,13 +13,14 @@
       --text: #ffffff;
       --success: #4caf50;
       --danger: #f44336;
+      --gray: #666;
     }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', system-ui, sans-serif;
     }
 
     body {
@@ -29,82 +30,106 @@
       display: flex;
       flex-direction: column;
       overflow-x: hidden;
+      position: relative;
     }
 
-    /* Главный контейнер */
+    /* Уведомление */
+    #notification {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: rgba(76, 175, 80, 0.95);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: bold;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.2, 1, 0.2, 1);
+      z-index: 2000;
+    }
+    #notification.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    #notification.hide {
+      transform: translateX(-50%) translateY(-100px);
+      opacity: 0;
+    }
+
+    /* Основной контейнер */
     #app {
       flex: 1;
-      padding: 20px;
+      padding: 10px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
     }
 
-    /* Страницы */
-    .page {
+    /* Верх: ракета и график */
+    .top-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    /* Ракета */
+    .rocket-container {
+      height: 120px;
+      position: relative;
+      background: var(--card-bg);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid #333;
+    }
+    #rocket {
+      position: absolute;
+      left: 20px;
+      bottom: 30px;
+      font-size: 2rem;
+      transition: all 0.1s linear;
+      z-index: 10;
+    }
+    .explosion {
+      position: absolute;
+      font-size: 2rem;
+      animation: explode 0.8s forwards;
+      z-index: 20;
+    }
+    @keyframes explode {
+      0% { transform: scale(0.5); opacity: 1; }
+      100% { transform: scale(2); opacity: 0; }
+    }
+
+    /* График */
+    .graph-container {
+      height: 100px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      position: relative;
+      border: 1px solid #333;
+    }
+    canvas {
       width: 100%;
-      max-width: 500px;
-      text-align: center;
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(20px);
-      transition: all 0.4s ease;
-    }
-    .page.active {
-      opacity: 1;
-      pointer-events: all;
-      transform: translateY(0);
+      height: 100%;
     }
 
-    /* Главная страница */
-    #homePage h1 {
-      font-size: 2.5rem;
-      background: linear-gradient(90deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 30px;
-    }
-
-    #homePage p {
-      margin: 20px 0;
-      font-size: 1.1rem;
-      color: #ccc;
-    }
-
-    /* Кнопки перехода */
-    .btn {
-      display: inline-block;
-      padding: 14px 30px;
-      margin: 10px;
-      border: none;
-      border-radius: 50px;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-    }
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-      box-shadow: 0 4px 15px rgba(255, 58, 91, 0.4);
-    }
-    .btn-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(255, 58, 91, 0.6);
-    }
-
-    /* Страница Crash */
-    #crashPage {
-      position: relative;
+    /* Низ: управление */
+    .bottom-section {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 20px;
+      margin-bottom: 80px; /* место под меню */
     }
 
     .balance {
-      font-size: 1.5rem;
-      margin: 20px 0;
+      font-size: 1.4rem;
+      margin: 10px 0;
       color: var(--success);
       font-weight: bold;
     }
@@ -112,8 +137,7 @@
     .inputs {
       display: flex;
       gap: 10px;
-      margin: 20px 0;
-      justify-content: center;
+      margin: 15px 0;
     }
     .inputs input {
       padding: 12px;
@@ -123,103 +147,54 @@
       color: white;
       font-size: 1rem;
       text-align: center;
-      width: 45%;
-    }
-    .inputs input:focus {
-      outline: none;
-      border-color: var(--secondary);
+      flex: 1;
     }
 
-    #betButton, #cashoutButton {
-      width: 100%;
+    .btn-row {
+      display: flex;
+      gap: 10px;
       margin: 15px 0;
+    }
+    .btn {
+      flex: 1;
       padding: 14px;
-      border-radius: 50px;
-      font-size: 1.1rem;
+      border-radius: 16px;
       font-weight: bold;
       border: none;
       cursor: pointer;
       transition: all 0.3s;
+      font-size: 0.95rem;
     }
-    #betButton {
-      background: var(--primary);
-      color: white;
-    }
-    #betButton:disabled {
-      background: #555;
-      cursor: not-allowed;
-    }
-    #cashoutButton {
-      background: var(--success);
-      color: white;
-      display: none;
-    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-success { background: var(--success); color: white; display: none; }
+    .btn:disabled { background: #555; cursor: not-allowed; }
 
-    /* Анимация ракеты */
-    .rocket-container {
-      height: 300px;
-      position: relative;
-      margin: 30px auto;
-      background: linear-gradient(to top, #1a1a2e, #0f0f1a);
-      border-radius: 16px;
-      border: 2px solid #333;
-      overflow: hidden;
+    /* История ставок */
+    .history {
+      margin-top: 20px;
+      text-align: left;
     }
-
-    .rocket-track {
-      position: absolute;
-      left: 50%;
-      bottom: 20px;
-      width: 4px;
-      height: 90%;
-      background: rgba(255, 204, 0, 0.3);
-      transform: translateX(-50%);
-    }
-
-    .rocket {
-      position: absolute;
-      left: 50%;
-      bottom: 20px;
-      width: 30px;
-      height: 50px;
-      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ff3a5b"><path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z"/></svg>') no-repeat center;
-      background-size: contain;
-      transform: translateX(-50%);
-      transition: bottom 0.15s linear;
-      z-index: 10;
-    }
-
-    .multiplier {
-      font-size: 3rem;
-      font-weight: bold;
-      color: var(--secondary);
-      margin: 20px 0;
-      text-shadow: 0 0 10px rgba(255, 204, 0, 0.7);
-    }
-
-    .status {
-      min-height: 24px;
+    .history h3 {
       font-size: 1.1rem;
-      margin: 15px 0;
+      margin-bottom: 10px;
       color: #ccc;
     }
-
-    .crashed .multiplier {
-      color: var(--danger);
-      animation: shake 0.5s;
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 0.9rem;
+      border-bottom: 1px solid #333;
     }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
-    }
+    .win { color: var(--success); }
+    .lose { color: var(--danger); }
 
     /* Нижнее меню */
     .bottom-nav {
       display: flex;
       justify-content: space-around;
       padding: 15px 10px;
-      background: rgba(26, 26, 46, 0.9);
+      background: rgba(26, 26, 46, 0.95);
       backdrop-filter: blur(10px);
       position: fixed;
       bottom: 0;
@@ -259,88 +234,113 @@
       z-index: 100;
       box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
     }
-    #addBalanceBtn:hover {
-      background: #3d8b40;
-    }
-
-    /* Анимация входа */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    .page.active {
-      animation: fadeInUp 0.6s ease forwards;
-    }
   </style>
 </head>
 <body>
 
+  <!-- Уведомление -->
+  <div id="notification">✅ Поздравляем! Успешно</div>
+
   <!-- Кнопка +100 -->
   <button id="addBalanceBtn">+100 💰</button>
 
-  <!-- Основной контейнер приложения -->
   <div id="app">
-    <!-- Главная страница -->
-    <div id="homePage" class="page active">
-      <h1>🚀 ROCKET CRASH</h1>
-      <p>Забирай выигрыш до того, как ракета улетит!</p>
-      <button class="btn btn-primary" onclick="switchPage('crash')">Играть в Crash</button>
+    <!-- Верх: ракета + график -->
+    <div class="top-section">
+      <div class="rocket-container">
+        <div id="rocket">🚀</div>
+      </div>
+      <div class="graph-container">
+        <canvas id="graph"></canvas>
+      </div>
     </div>
 
-    <!-- Страница Crash -->
-    <div id="crashPage" class="page">
+    <!-- Низ: управление + история -->
+    <div class="bottom-section">
       <div class="balance">Баланс: $<span id="balance">1000</span></div>
 
       <div class="inputs">
         <input type="number" id="betAmount" placeholder="Ставка" min="1" value="10">
-        <input type="number" id="cashoutAt" placeholder="Авто-забрать x" min="1.1" step="0.1" value="2.0">
+        <input type="number" id="cashoutAt" placeholder="Авто x" min="1.1" step="0.1" value="2.0">
       </div>
 
-      <button id="betButton">🚀 ЗАПУСТИТЬ РАКЕТУ</button>
-      <button id="cashoutButton">💰 ЗАБРАТЬ ВЫИГРЫШ</button>
-
-      <div class="rocket-container">
-        <div class="rocket-track"></div>
-        <div class="rocket" id="rocket"></div>
+      <div class="btn-row">
+        <button id="betButton" class="btn btn-primary">🚀 СТАРТ</button>
+        <button id="cashoutButton" class="btn btn-success">💰 ЗАБРАТЬ</button>
       </div>
 
-      <div class="multiplier" id="multiplier">x1.00</div>
-      <div class="status" id="status"></div>
+      <div class="history">
+        <h3>История ставок</h3>
+        <div id="historyList">
+          <!-- сюда добавляются ставки -->
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- Нижнее меню -->
   <div class="bottom-nav">
-    <button class="nav-btn active" onclick="switchPage('home')">Главная</button>
-    <button class="nav-btn" onclick="switchPage('crash')">Crash</button>
+    <button class="nav-btn">Главная</button>
+    <button class="nav-btn active">Crash</button>
   </div>
 
   <script>
-    // Инициализация баланса
+    // ================= ЗВУКИ (тихие!) =================
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      const osc = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      osc.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      gainNode.gain.value = 0.05; // ТИХО!
+
+      switch(type) {
+        case 'launch':
+          osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.5);
+          break;
+        case 'cashout':
+          osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.3);
+          break;
+        case 'crash':
+          osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.5);
+          gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+          break;
+      }
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.5);
+    }
+
+    // ================= ИНИЦИАЛИЗАЦИЯ =================
     let balance = parseFloat(localStorage.getItem('crashBalance')) || 1000;
     let gameInterval = null;
     let currentMultiplier = 1.00;
     let crashPoint = 0;
     let betAmount = 0;
     let isPlaying = false;
+    let graphData = [];
+    const maxGraphPoints = 50;
+
+    const canvas = document.getElementById('graph');
+    const ctx = canvas.getContext('2d');
+    let rocket = document.getElementById('rocket');
+    let notification = document.getElementById('notification');
 
     updateBalance();
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
-    const addBalanceBtn = document.getElementById('addBalanceBtn');
-    const betButton = document.getElementById('betButton');
-    const cashoutButton = document.getElementById('cashoutButton');
-    const rocket = document.getElementById('rocket');
+    // ================= СОБЫТИЯ =================
+    document.getElementById('addBalanceBtn').addEventListener('click', addBalance);
+    document.getElementById('betButton').addEventListener('click', startGame);
+    document.getElementById('cashoutButton').addEventListener('click', manualCashout);
 
-    addBalanceBtn.addEventListener('click', addBalance);
-    betButton.addEventListener('click', startGame);
-    cashoutButton.addEventListener('click', manualCashout);
-
+    // ================= ФУНКЦИИ =================
     function updateBalance() {
       document.getElementById('balance').textContent = balance.toFixed(2);
       localStorage.setItem('crashBalance', balance);
@@ -349,76 +349,94 @@
     function addBalance() {
       balance += 100;
       updateBalance();
-      showStatus("✅ +100 добавлено для теста!", 2000);
-    }
-
-    function switchPage(page) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-
-      if (page === 'home') {
-        document.getElementById('homePage').classList.add('active');
-        document.querySelector('.nav-btn:nth-child(1)').classList.add('active');
-      } else if (page === 'crash') {
-        document.getElementById('crashPage').classList.add('active');
-        document.querySelector('.nav-btn:nth-child(2)').classList.add('active');
-      }
     }
 
     function startGame() {
+      if (isPlaying) return;
+
       const bet = parseFloat(document.getElementById('betAmount').value);
       const autoCashout = parseFloat(document.getElementById('cashoutAt').value);
 
-      if (isNaN(bet) || bet <= 0) return showStatus("❌ Введите ставку!");
-      if (isNaN(autoCashout) || autoCashout < 1.01) return showStatus("❌ Коэф > 1.01!");
-      if (bet > balance) return showStatus("❌ Недостаточно средств!");
+      if (isNaN(bet) || bet <= 0) return alert("Введите ставку!");
+      if (isNaN(autoCashout) || autoCashout < 1.01) return alert("Коэф > 1.01!");
+      if (bet > balance) return alert("Недостаточно средств!");
 
       balance -= bet;
       betAmount = bet;
       updateBalance();
 
-      // Генерация точки краха
       crashPoint = 1 + Math.random() * (Math.random() > 0.7 ? 20 : 5);
-      console.log("🚀 Ракета взорвётся на x" + crashPoint.toFixed(2));
+      console.log("💥 Крах на x" + crashPoint.toFixed(2));
 
-      // Сброс состояния
       isPlaying = true;
       currentMultiplier = 1.00;
+      graphData = [{ x: 0, y: 1 }];
       resetRocket();
-      betButton.disabled = true;
-      cashoutButton.style.display = "block";
-      document.getElementById('multiplier').textContent = "x1.00";
-      document.getElementById('multiplier').classList.remove('crashed');
-      showStatus(`🚀 Ракета запущена со ставкой $${bet}!`);
+      document.getElementById('betButton').disabled = true;
+      document.getElementById('cashoutButton').style.display = "block";
 
-      // Запуск игры
+      playSound('launch');
+
       gameInterval = setInterval(() => {
         currentMultiplier += 0.05;
+        updateRocket();
+        updateGraph();
 
-        // Обновление UI
-        document.getElementById('multiplier').textContent = `x${currentMultiplier.toFixed(2)}`;
-        moveRocket(currentMultiplier);
-
-        // Автоматический забор
         if (currentMultiplier >= autoCashout) {
           autoCashoutTrigger(autoCashout);
         }
-
-        // Крах
         if (currentMultiplier >= crashPoint) {
           crash();
         }
       }, 150);
     }
 
-    function moveRocket(multiplier) {
-      const maxHeight = 250; // максимальная высота в пикселях
-      const rocketHeight = Math.min(maxHeight, (multiplier - 1) * 20);
-      rocket.style.bottom = (20 + rocketHeight) + "px";
+    function updateRocket() {
+      const maxX = canvas.parentElement.clientWidth - 60;
+      const maxY = 80;
+      const progress = Math.min(1, (currentMultiplier - 1) / (crashPoint - 1));
+      const x = 20 + progress * maxX;
+      const y = 30 + progress * maxY; // летит вправо и вверх
+      rocket.style.left = x + "px";
+      rocket.style.bottom = y + "px";
     }
 
     function resetRocket() {
-      rocket.style.bottom = "20px";
+      rocket.style.left = "20px";
+      rocket.style.bottom = "30px";
+    }
+
+    function updateGraph() {
+      graphData.push({ x: graphData.length, y: currentMultiplier });
+      if (graphData.length > maxGraphPoints) graphData.shift();
+      drawGraph();
+    }
+
+    function drawGraph() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = '#ffcc00';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+
+      const w = canvas.width;
+      const h = canvas.height;
+      const stepX = w / (maxGraphPoints - 1);
+      const maxVisibleY = Math.max(5, Math.ceil(currentMultiplier));
+
+      for (let i = 0; i < graphData.length; i++) {
+        const x = i * stepX;
+        const y = h - (graphData[i].y / maxVisibleY) * (h - 10);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+
+    function resizeCanvas() {
+      const container = canvas.parentElement;
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
+      drawGraph();
     }
 
     function manualCashout() {
@@ -430,7 +448,11 @@
       const win = betAmount * currentMultiplier;
       balance += win;
       updateBalance();
-      showStatus(`💰 Забрали вручную! +$${win.toFixed(2)} при x${currentMultiplier.toFixed(2)}`);
+      addToHistory(`+$${win.toFixed(2)} при x${currentMultiplier.toFixed(2)}`, true);
+
+      playSound('cashout');
+      showSuccessNotification();
+
       endRound();
     }
 
@@ -443,7 +465,11 @@
       const win = betAmount * target;
       balance += win;
       updateBalance();
-      showStatus(`✅ Авто-забор! +$${win.toFixed(2)} при x${target}`);
+      addToHistory(`+$${win.toFixed(2)} при x${target}`, true);
+
+      playSound('cashout');
+      showSuccessNotification();
+
       endRound();
     }
 
@@ -453,30 +479,49 @@
       clearInterval(gameInterval);
       isPlaying = false;
 
-      document.getElementById('multiplier').classList.add('crashed');
-      document.getElementById('multiplier').textContent = `x${crashPoint.toFixed(2)} 💥`;
-      showStatus(`💥 Ракета взорвалась! Потеряно $${betAmount}`);
+      // Анимация взрыва
+      const explosion = document.createElement('div');
+      explosion.className = 'explosion';
+      explosion.textContent = '💥';
+      explosion.style.left = rocket.style.left;
+      explosion.style.bottom = rocket.style.bottom;
+      document.querySelector('.rocket-container').appendChild(explosion);
+
+      setTimeout(() => {
+        explosion.remove();
+      }, 800);
+
+      addToHistory(`-$${betAmount} (крах)`, false);
+      playSound('crash');
 
       endRound();
     }
 
     function endRound() {
       setTimeout(() => {
-        betButton.disabled = false;
-        cashoutButton.style.display = "none";
+        document.getElementById('betButton').disabled = false;
+        document.getElementById('cashoutButton').style.display = "none";
         resetRocket();
       }, 2500);
     }
 
-    function showStatus(text, timeout = 3000) {
-      const status = document.getElementById('status');
-      status.textContent = text;
-      if (timeout) {
-        setTimeout(() => {
-          if (status.textContent === text) {
-            status.textContent = "";
-          }
-        }, timeout);
+    function showSuccessNotification() {
+      notification.classList.remove('hide');
+      notification.classList.add('show');
+      setTimeout(() => {
+        notification.classList.remove('show');
+        notification.classList.add('hide');
+      }, 2500);
+    }
+
+    function addToHistory(text, isWin) {
+      const historyList = document.getElementById('historyList');
+      const item = document.createElement('div');
+      item.className = `history-item ${isWin ? 'win' : 'lose'}`;
+      item.textContent = text;
+      historyList.prepend(item);
+      if (historyList.children.length > 5) {
+        historyList.removeChild(historyList.lastChild);
       }
     }
   </script>
