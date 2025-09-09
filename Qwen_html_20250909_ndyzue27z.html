@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Crash Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #121212;
+      color: white;
+      padding: 20px;
+      margin: 0;
+      position: relative; /* Для позиционирования кнопки */
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      background: #1e1e1e;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    h1 {
+      color: #ff5e5e;
+    }
+    .balance {
+      font-size: 24px;
+      margin: 20px 0;
+      color: #4caf50;
+    }
+    input, button {
+      padding: 12px;
+      margin: 10px 5px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+    }
+    input {
+      background: #2c2c2c;
+      color: white;
+      width: 45%;
+    }
+    button {
+      background: #ff5e5e;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      width: 100%;
+    }
+    button:disabled {
+      background: #555;
+      cursor: not-allowed;
+    }
+    .multiplier {
+      font-size: 60px;
+      font-weight: bold;
+      color: #ffcc00;
+      margin: 30px 0;
+      transition: color 0.3s;
+    }
+    .status {
+      font-size: 18px;
+      margin: 15px 0;
+      min-height: 24px;
+    }
+    .crashed {
+      color: #ff3333;
+      animation: pulse 0.5s;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    /* Кнопка +100 в углу */
+    #addBalanceBtn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 8px 12px;
+      background: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+    #addBalanceBtn:hover {
+      background: #3d8b40;
+    }
+  </style>
+</head>
+<body>
+  <!-- Кнопка +100 в правом верхнем углу -->
+  <button id="addBalanceBtn">+100 💰</button>
+
+  <div class="container">
+    <h1>🚀 CRASH GAME</h1>
+    <div class="balance">Баланс: $<span id="balance">1000</span></div>
+
+    <input type="number" id="betAmount" placeholder="Ставка" min="1" value="10">
+    <input type="number" id="cashoutAt" placeholder="Забрать при x" min="1.1" step="0.1" value="2.0">
+
+    <button id="betButton">ПОСТАВИТЬ</button>
+
+    <div class="multiplier" id="multiplier">x1.00</div>
+    <div class="status" id="status"></div>
+  </div>
+
+  <script>
+    // Инициализация баланса из localStorage или 1000 по умолчанию
+    let balance = parseFloat(localStorage.getItem('crashBalance')) || 1000;
+    updateBalance();
+
+    const betButton = document.getElementById('betButton');
+    const betAmountInput = document.getElementById('betAmount');
+    const cashoutAtInput = document.getElementById('cashoutAt');
+    const multiplierDisplay = document.getElementById('multiplier');
+    const statusDisplay = document.getElementById('status');
+    const addBalanceBtn = document.getElementById('addBalanceBtn');
+
+    betButton.addEventListener('click', startGame);
+    addBalanceBtn.addEventListener('click', addBalance);
+
+    function updateBalance() {
+      document.getElementById('balance').textContent = balance.toFixed(2);
+      localStorage.setItem('crashBalance', balance);
+    }
+
+    function addBalance() {
+      balance += 100;
+      updateBalance();
+      statusDisplay.textContent = "✅ +100 добавлено для теста!";
+      setTimeout(() => {
+        if (statusDisplay.textContent.includes("теста")) {
+          statusDisplay.textContent = "";
+        }
+      }, 2000);
+    }
+
+    function startGame() {
+      const bet = parseFloat(betAmountInput.value);
+      const cashoutTarget = parseFloat(cashoutAtInput.value);
+
+      if (isNaN(bet) || bet <= 0) {
+        statusDisplay.textContent = "❌ Введите корректную ставку!";
+        return;
+      }
+      if (isNaN(cashoutTarget) || cashoutTarget < 1.01) {
+        statusDisplay.textContent = "❌ Коэффициент должен быть > 1.01!";
+        return;
+      }
+      if (bet > balance) {
+        statusDisplay.textContent = "❌ Недостаточно средств!";
+        return;
+      }
+
+      // Снимаем ставку с баланса
+      balance -= bet;
+      updateBalance();
+      betButton.disabled = true;
+      statusDisplay.textContent = `Ставка $${bet} принята. Ожидайте...`;
+      multiplierDisplay.textContent = "x1.00";
+      multiplierDisplay.classList.remove('crashed');
+
+      // Генерируем случайный коэффициент краха
+      const crashPoint = 1 + Math.random() * (Math.random() > 0.7 ? 20 : 5);
+      console.log("Crash at:", crashPoint.toFixed(2));
+
+      let currentMultiplier = 1.00;
+      let cashedOut = false;
+
+      // Анимация роста множителя
+      const gameInterval = setInterval(() => {
+        currentMultiplier += 0.05;
+
+        multiplierDisplay.textContent = `x${currentMultiplier.toFixed(2)}`;
+
+        // Проверка: игрок забирает?
+        if (currentMultiplier >= cashoutTarget && !cashedOut) {
+          cashedOut = true;
+          const winAmount = bet * cashoutTarget;
+          balance += winAmount;
+          updateBalance();
+          statusDisplay.textContent = `✅ Забрали! +$${winAmount.toFixed(2)} при x${cashoutTarget}`;
+          multiplierDisplay.style.color = "#4caf50";
+          clearInterval(gameInterval);
+          setTimeout(() => {
+            resetGame();
+          }, 2000);
+        }
+
+        // Проверка: крах?
+        if (currentMultiplier >= crashPoint) {
+          clearInterval(gameInterval);
+          multiplierDisplay.classList.add('crashed');
+          multiplierDisplay.textContent = `x${crashPoint.toFixed(2)} 💥`;
+          statusDisplay.textContent = `💥 Крах! Потеряно $${bet}`;
+          setTimeout(() => {
+            resetGame();
+          }, 2000);
+        }
+      }, 150);
+    }
+
+    function resetGame() {
+      betButton.disabled = false;
+      multiplierDisplay.style.color = "#ffcc00";
+      statusDisplay.textContent = "";
+    }
+  </script>
+</body>
+</html>
