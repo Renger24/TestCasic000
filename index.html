@@ -3,528 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🚀 Rocket Crash</title>
-  <style>
-    :root {
-      --primary: #ff3a5b;
-      --secondary: #ffcc00;
-      --bg: #0f0f1a;
-      --card-bg: #1a1a2e;
-      --text: #ffffff;
-      --success: #4caf50;
-      --danger: #f44336;
-      --gray: #666;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-x: hidden;
-      position: relative;
-    }
-
-    /* Уведомление */
-    #notification {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-100px);
-      background: rgba(76, 175, 80, 0.95);
-      color: white;
-      padding: 15px 25px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: bold;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-      opacity: 0;
-      transition: all 0.4s cubic-bezier(0.2, 1, 0.2, 1);
-      z-index: 2000;
-    }
-    #notification.show {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
-    }
-    #notification.hide {
-      transform: translateX(-50%) translateY(-100px);
-      opacity: 0;
-    }
-
-    /* Основной контейнер */
-    #app {
-      flex: 1;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Верх: ракета и график */
-    .top-section {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin-bottom: 15px;
-    }
-
-    /* Ракета */
-    .rocket-container {
-      height: 120px;
-      position: relative;
-      background: var(--card-bg);
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid #333;
-    }
-    #rocket {
-      position: absolute;
-      left: 20px;
-      bottom: 30px;
-      font-size: 2rem;
-      transition: all 0.1s linear;
-      z-index: 10;
-    }
-    .explosion {
-      position: absolute;
-      font-size: 2rem;
-      animation: explode 0.8s forwards;
-      z-index: 20;
-    }
-    @keyframes explode {
-      0% { transform: scale(0.5); opacity: 1; }
-      100% { transform: scale(2); opacity: 0; }
-    }
-
-    /* График */
-    .graph-container {
-      height: 100px;
-      background: var(--card-bg);
-      border-radius: 12px;
-      position: relative;
-      border: 1px solid #333;
-    }
-    canvas {
-      width: 100%;
-      height: 100%;
-    }
-
-    /* Низ: управление */
-    .bottom-section {
-      background: var(--card-bg);
-      padding: 20px;
-      border-radius: 20px;
-      margin-bottom: 80px; /* место под меню */
-    }
-
-    .balance {
-      font-size: 1.4rem;
-      margin: 10px 0;
-      color: var(--success);
-      font-weight: bold;
-    }
-
-    .inputs {
-      display: flex;
-      gap: 10px;
-      margin: 15px 0;
-    }
-    .inputs input {
-      padding: 12px;
-      border-radius: 12px;
-      border: 2px solid #333;
-      background: #252535;
-      color: white;
-      font-size: 1rem;
-      text-align: center;
-      flex: 1;
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 10px;
-      margin: 15px 0;
-    }
-    .btn {
-      flex: 1;
-      padding: 14px;
-      border-radius: 16px;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-size: 0.95rem;
-    }
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-success { background: var(--success); color: white; display: none; }
-    .btn:disabled { background: #555; cursor: not-allowed; }
-
-    /* История ставок */
-    .history {
-      margin-top: 20px;
-      text-align: left;
-    }
-    .history h3 {
-      font-size: 1.1rem;
-      margin-bottom: 10px;
-      color: #ccc;
-    }
-    .history-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
-      font-size: 0.9rem;
-      border-bottom: 1px solid #333;
-    }
-    .win { color: var(--success); }
-    .lose { color: var(--danger); }
-
-    /* Нижнее меню */
-    .bottom-nav {
-      display: flex;
-      justify-content: space-around;
-      padding: 15px 10px;
-      background: rgba(26, 26, 46, 0.95);
-      backdrop-filter: blur(10px);
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      max-width: 500px;
-      z-index: 1000;
-      border-top: 1px solid #333;
-    }
-    .nav-btn {
-      padding: 8px 16px;
-      border-radius: 20px;
-      background: transparent;
-      color: #aaa;
-      border: none;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    .nav-btn.active {
-      color: var(--secondary);
-      background: rgba(255, 204, 0, 0.1);
-      font-weight: bold;
-    }
-
-    /* Кнопка +100 */
-    #addBalanceBtn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 8px 16px;
-      background: var(--success);
-      color: white;
-      border: none;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      z-index: 100;
-      box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
-    }
-  </style>
+  <title>🚀 Rocket Crash — Главная</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="home-body">
 
-  <!-- Уведомление -->
-  <div id="notification">✅ Поздравляем! Успешно</div>
+  <!-- Главный экран -->
+  <div class="hero">
+    <div class="hero-content">
+      <h1>🚀 ROCKET CRASH</h1>
+      <p class="subtitle">Забирай выигрыш до того, как ракета улетит в космос!<br>Каждая секунда — риск и прибыль.</p>
 
-  <!-- Кнопка +100 -->
-  <button id="addBalanceBtn">+100 💰</button>
-
-  <div id="app">
-    <!-- Верх: ракета + график -->
-    <div class="top-section">
-      <div class="rocket-container">
-        <div id="rocket">🚀</div>
-      </div>
-      <div class="graph-container">
-        <canvas id="graph"></canvas>
-      </div>
-    </div>
-
-    <!-- Низ: управление + история -->
-    <div class="bottom-section">
-      <div class="balance">Баланс: $<span id="balance">1000</span></div>
-
-      <div class="inputs">
-        <input type="number" id="betAmount" placeholder="Ставка" min="1" value="10">
-        <input type="number" id="cashoutAt" placeholder="Авто x" min="1.1" step="0.1" value="2.0">
-      </div>
-
-      <div class="btn-row">
-        <button id="betButton" class="btn btn-primary">🚀 СТАРТ</button>
-        <button id="cashoutButton" class="btn btn-success">💰 ЗАБРАТЬ</button>
-      </div>
-
-      <div class="history">
-        <h3>История ставок</h3>
-        <div id="historyList">
-          <!-- сюда добавляются ставки -->
-        </div>
+      <div class="cta-buttons">
+        <a href="crash.html" class="btn btn-glow btn-primary">
+          🎮 Играть сейчас
+        </a>
+        <a href="#how-to-play" class="btn btn-outline">
+          📖 Как играть?
+        </a>
       </div>
     </div>
   </div>
+
+  <!-- Инструкция -->
+  <section id="how-to-play" class="section how-to">
+    <h2>🎯 Как играть?</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>Сделай ставку</h3>
+        <p>Укажи сумму, которую готов рискнуть.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>Запусти ракету</h3>
+        <p>Нажми "СТАРТ" — коэффициент начнёт расти.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>Забери вовремя</h3>
+        <p>Нажми "ЗАБРАТЬ" до краха — получи выигрыш!</p>
+      </div>
+    </div>
+  </section>
 
   <!-- Нижнее меню -->
   <div class="bottom-nav">
-    <button class="nav-btn">Главная</button>
-    <button class="nav-btn active">Crash</button>
+    <button class="nav-btn active">Главная</button>
+    <button class="nav-btn" onclick="location.href='crash.html'">Crash</button>
   </div>
 
-  <script>
-    // ================= ЗВУКИ (тихие!) =================
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-    function playSound(type) {
-      const osc = audioCtx.createOscillator();
-      const gainNode = audioCtx.createGain();
-      osc.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
-
-      gainNode.gain.value = 0.05; // ТИХО!
-
-      switch(type) {
-        case 'launch':
-          osc.frequency.setValueAtTime(200, audioCtx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.5);
-          break;
-        case 'cashout':
-          osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.3);
-          break;
-        case 'crash':
-          osc.frequency.setValueAtTime(100, audioCtx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.5);
-          gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
-          break;
-      }
-
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.5);
-    }
-
-    // ================= ИНИЦИАЛИЗАЦИЯ =================
-    let balance = parseFloat(localStorage.getItem('crashBalance')) || 1000;
-    let gameInterval = null;
-    let currentMultiplier = 1.00;
-    let crashPoint = 0;
-    let betAmount = 0;
-    let isPlaying = false;
-    let graphData = [];
-    const maxGraphPoints = 50;
-
-    const canvas = document.getElementById('graph');
-    const ctx = canvas.getContext('2d');
-    let rocket = document.getElementById('rocket');
-    let notification = document.getElementById('notification');
-
-    updateBalance();
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    // ================= СОБЫТИЯ =================
-    document.getElementById('addBalanceBtn').addEventListener('click', addBalance);
-    document.getElementById('betButton').addEventListener('click', startGame);
-    document.getElementById('cashoutButton').addEventListener('click', manualCashout);
-
-    // ================= ФУНКЦИИ =================
-    function updateBalance() {
-      document.getElementById('balance').textContent = balance.toFixed(2);
-      localStorage.setItem('crashBalance', balance);
-    }
-
-    function addBalance() {
-      balance += 100;
-      updateBalance();
-    }
-
-    function startGame() {
-      if (isPlaying) return;
-
-      const bet = parseFloat(document.getElementById('betAmount').value);
-      const autoCashout = parseFloat(document.getElementById('cashoutAt').value);
-
-      if (isNaN(bet) || bet <= 0) return alert("Введите ставку!");
-      if (isNaN(autoCashout) || autoCashout < 1.01) return alert("Коэф > 1.01!");
-      if (bet > balance) return alert("Недостаточно средств!");
-
-      balance -= bet;
-      betAmount = bet;
-      updateBalance();
-
-      crashPoint = 1 + Math.random() * (Math.random() > 0.7 ? 20 : 5);
-      console.log("💥 Крах на x" + crashPoint.toFixed(2));
-
-      isPlaying = true;
-      currentMultiplier = 1.00;
-      graphData = [{ x: 0, y: 1 }];
-      resetRocket();
-      document.getElementById('betButton').disabled = true;
-      document.getElementById('cashoutButton').style.display = "block";
-
-      playSound('launch');
-
-      gameInterval = setInterval(() => {
-        currentMultiplier += 0.05;
-        updateRocket();
-        updateGraph();
-
-        if (currentMultiplier >= autoCashout) {
-          autoCashoutTrigger(autoCashout);
-        }
-        if (currentMultiplier >= crashPoint) {
-          crash();
-        }
-      }, 150);
-    }
-
-    function updateRocket() {
-      const maxX = canvas.parentElement.clientWidth - 60;
-      const maxY = 80;
-      const progress = Math.min(1, (currentMultiplier - 1) / (crashPoint - 1));
-      const x = 20 + progress * maxX;
-      const y = 30 + progress * maxY; // летит вправо и вверх
-      rocket.style.left = x + "px";
-      rocket.style.bottom = y + "px";
-    }
-
-    function resetRocket() {
-      rocket.style.left = "20px";
-      rocket.style.bottom = "30px";
-    }
-
-    function updateGraph() {
-      graphData.push({ x: graphData.length, y: currentMultiplier });
-      if (graphData.length > maxGraphPoints) graphData.shift();
-      drawGraph();
-    }
-
-    function drawGraph() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.strokeStyle = '#ffcc00';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-
-      const w = canvas.width;
-      const h = canvas.height;
-      const stepX = w / (maxGraphPoints - 1);
-      const maxVisibleY = Math.max(5, Math.ceil(currentMultiplier));
-
-      for (let i = 0; i < graphData.length; i++) {
-        const x = i * stepX;
-        const y = h - (graphData[i].y / maxVisibleY) * (h - 10);
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-    }
-
-    function resizeCanvas() {
-      const container = canvas.parentElement;
-      canvas.width = container.clientWidth;
-      canvas.height = container.clientHeight;
-      drawGraph();
-    }
-
-    function manualCashout() {
-      if (!isPlaying) return;
-
-      clearInterval(gameInterval);
-      isPlaying = false;
-
-      const win = betAmount * currentMultiplier;
-      balance += win;
-      updateBalance();
-      addToHistory(`+$${win.toFixed(2)} при x${currentMultiplier.toFixed(2)}`, true);
-
-      playSound('cashout');
-      showSuccessNotification();
-
-      endRound();
-    }
-
-    function autoCashoutTrigger(target) {
-      if (!isPlaying) return;
-
-      clearInterval(gameInterval);
-      isPlaying = false;
-
-      const win = betAmount * target;
-      balance += win;
-      updateBalance();
-      addToHistory(`+$${win.toFixed(2)} при x${target}`, true);
-
-      playSound('cashout');
-      showSuccessNotification();
-
-      endRound();
-    }
-
-    function crash() {
-      if (!isPlaying) return;
-
-      clearInterval(gameInterval);
-      isPlaying = false;
-
-      // Анимация взрыва
-      const explosion = document.createElement('div');
-      explosion.className = 'explosion';
-      explosion.textContent = '💥';
-      explosion.style.left = rocket.style.left;
-      explosion.style.bottom = rocket.style.bottom;
-      document.querySelector('.rocket-container').appendChild(explosion);
-
-      setTimeout(() => {
-        explosion.remove();
-      }, 800);
-
-      addToHistory(`-$${betAmount} (крах)`, false);
-      playSound('crash');
-
-      endRound();
-    }
-
-    function endRound() {
-      setTimeout(() => {
-        document.getElementById('betButton').disabled = false;
-        document.getElementById('cashoutButton').style.display = "none";
-        resetRocket();
-      }, 2500);
-    }
-
-    function showSuccessNotification() {
-      notification.classList.remove('hide');
-      notification.classList.add('show');
-      setTimeout(() => {
-        notification.classList.remove('show');
-        notification.classList.add('hide');
-      }, 2500);
-    }
-
-    function addToHistory(text, isWin) {
-      const historyList = document.getElementById('historyList');
-      const item = document.createElement('div');
-      item.className = `history-item ${isWin ? 'win' : 'lose'}`;
-      item.textContent = text;
-      historyList.prepend(item);
-      if (historyList.children.length > 5) {
-        historyList.removeChild(historyList.lastChild);
-      }
-    }
-  </script>
-
+  <script src="js/main.js"></script>
 </body>
 </html>
