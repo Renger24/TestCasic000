@@ -408,3 +408,59 @@ canvas {
     font-size: 0.8rem;
   }
 }
+
+/* ============= БЫСТРЫЕ КНОПКИ ============= */
+
+.input-group {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.input-with-presets {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-with-presets input {
+  padding: 12px;
+  border-radius: 12px 12px 0 0;
+  border: 2px solid #333;
+  background: #252535;
+  color: white;
+  font-size: 1rem;
+  text-align: center;
+  border-bottom: none;
+}
+
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  background: #252535;
+  padding: 4px;
+  border-radius: 0 0 12px 12px;
+  border: 2px solid #333;
+  border-top: none;
+}
+
+.preset {
+  flex: 1;
+  min-width: 30px;
+  padding: 4px 2px;
+  font-size: 0.75rem;
+  background: #333;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.preset:hover {
+  background: #444;
+  transform: scale(1.05);
+}
