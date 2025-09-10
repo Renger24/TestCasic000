@@ -153,6 +153,10 @@ function drawGraph() {
     else ctx.lineTo(x, y);
   }
   ctx.stroke();
+  ctx.fillStyle = '#ffcc00';
+ctx.font = 'bold 16px Arial';
+ctx.textAlign = 'right';
+ctx.fillText(`x${currentMultiplier.toFixed(2)}`, w - 10, 25);
 }
 
 function resizeCanvas() {
@@ -244,4 +248,5 @@ function showSuccessNotification() {
     notification.classList.remove('show');
     notification.classList.add('hide');
   }, 2500);
+
 }
