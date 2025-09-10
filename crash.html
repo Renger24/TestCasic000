@@ -29,10 +29,29 @@
     <div class="bottom-section">
       <div class="balance">Баланс: $<span id="balance">1000</span></div>
 
-      <div class="inputs">
-        <input type="number" id="betAmount" placeholder="Ставка" min="1" value="10">
-        <input type="number" id="cashoutAt" placeholder="Авто x" min="1.1" step="0.1" value="2.0">
-      </div>
+      <div class="input-group">
+  <div class="input-with-presets">
+    <input type="number" id="betAmount" placeholder="Ставка" min="1" value="10">
+    <div class="presets">
+      <button type="button" class="preset" onclick="setBet(10)">10</button>
+      <button type="button" class="preset" onclick="setBet(50)">50</button>
+      <button type="button" class="preset" onclick="setBet(100)">100</button>
+      <button type="button" class="preset" onclick="multiplyBet(2)">x2</button>
+      <button type="button" class="preset" onclick="divideBet(2)">/2</button>
+    </div>
+  </div>
+
+  <!-- Автовывод с пресетами -->
+  <div class="input-with-presets">
+    <input type="number" id="cashoutAt" placeholder="Авто x" min="1.1" step="0.1" value="2.0">
+    <div class="presets">
+      <button type="button" class="preset" onclick="setCashout(2)">2x</button>
+      <button type="button" class="preset" onclick="setCashout(3)">3x</button>
+      <button type="button" class="preset" onclick="setCashout(5)">5x</button>
+      <button type="button" class="preset" onclick="setCashout(10)">10x</button>
+    </div>
+  </div>
+</div>
 
       <div class="btn-row">
         <button id="betButton" class="btn btn-primary">🚀 СТАРТ</button>
