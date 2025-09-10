@@ -89,6 +89,32 @@ body {
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(255, 58, 91, 0.6);
 }
+.btn-success {
+  background: var(--success);
+  color: white;
+  display: none;
+}
+.btn-outline {
+  background: transparent;
+  color: var(--secondary);
+  border: 2px solid var(--secondary);
+}
+.btn-outline:hover {
+  background: rgba(255, 204, 0, 0.1);
+  transform: translateY(-5px);
+}
+.btn-glow {
+  position: relative;
+  overflow: hidden;
+}
+.btn-glow:hover {
+  box-shadow: 0 0 30px rgba(255, 204, 0, 0.7);
+  transform: translateY(-5px) scale(1.05);
+}
+.btn:disabled {
+  background: #555;
+  cursor: not-allowed;
+}
 
 /* Основной контейнер приложения */
 #app {
@@ -98,7 +124,7 @@ body {
   flex-direction: column;
 }
 
-/* Верх: ракета и график */
+/* Верх: таймер, ракета и график */
 .top-section {
   flex: 1;
   display: flex;
@@ -107,21 +133,39 @@ body {
   margin-bottom: 15px;
 }
 
+/* Таймер */
+.countdown-timer {
+  text-align: center;
+}
+#countdownDisplay {
+  font-size: 1.2rem;
+  color: #ffcc00;
+  font-weight: bold;
+  background: rgba(26, 26, 46, 0.7);
+  padding: 10px;
+  border-radius: 12px;
+  display: inline-block;
+}
+
 /* Ракета */
 .rocket-container {
   height: 120px;
   position: relative;
-  background: var(--card-bg);
+  background: linear-gradient(90deg, #1a1a2e, #0f0f1a, #1a1a2e);
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid #333;
+  animation: bgMove 10s linear infinite;
+}
+@keyframes bgMove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
 }
 #rocket {
   position: absolute;
   left: 20px;
   bottom: 30px;
-  font-size: 2rem;
-  transition: all 0.1s linear;
+  transition: all 0.325s linear;
   z-index: 10;
 }
 .explosion {
@@ -137,10 +181,10 @@ body {
 
 /* График */
 .graph-container {
-  height: 350px; /* Задаём высоту 350px */
-  max-width: 1213px; /* Максимальная ширина */
-  width: 100%; /* Но на мобильных — растягивается на всю ширину */
-  margin: 0 auto; /* Центрируем, если экран шире 1213px */
+  height: 350px;
+  max-width: 1213px;
+  width: 100%;
+  margin: 0 auto;
   background: var(--card-bg);
   border-radius: 12px;
   position: relative;
@@ -167,28 +211,67 @@ canvas {
   font-weight: bold;
 }
 
-.inputs {
+/* Быстрые кнопки */
+.input-group {
   display: flex;
   gap: 10px;
-  margin: 15px 0;
+  margin: 20px 0;
+  flex-wrap: wrap;
 }
-.inputs input {
+
+.input-with-presets {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-with-presets input {
   padding: 12px;
-  border-radius: 12px;
+  border-radius: 12px 12px 0 0;
   border: 2px solid #333;
   background: #252535;
   color: white;
   font-size: 1rem;
   text-align: center;
-  flex: 1;
+  border-bottom: none;
 }
 
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  background: #252535;
+  padding: 4px;
+  border-radius: 0 0 12px 12px;
+  border: 2px solid #333;
+  border-top: none;
+}
+
+.preset {
+  flex: 1;
+  min-width: 30px;
+  padding: 4px 2px;
+  font-size: 0.75rem;
+  background: #333;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.preset:hover {
+  background: #444;
+  transform: scale(1.05);
+}
+
+/* Кнопки управления */
 .btn-row {
   display: flex;
   gap: 10px;
   margin: 15px 0;
 }
-.btn {
+.btn-row .btn {
   flex: 1;
   padding: 14px;
   border-radius: 16px;
@@ -198,9 +281,6 @@ canvas {
   transition: all 0.3s;
   font-size: 0.95rem;
 }
-.btn-primary { background: var(--primary); color: white; }
-.btn-success { background: var(--success); color: white; display: none; }
-.btn:disabled { background: #555; cursor: not-allowed; }
 
 /* История ставок */
 .history, .multiplayer {
@@ -242,12 +322,12 @@ canvas {
   position: fixed;
   bottom: 0;
   width: 100%;
-  max-width: 500px;
+  max-width: 100%;
   z-index: 1000;
   border-top: 1px solid #333;
 }
 .nav-btn {
-  padding: 8px 16px;
+  padding: 12px 24px;
   border-radius: 20px;
   background: transparent;
   color: #aaa;
@@ -255,6 +335,9 @@ canvas {
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s;
+  flex: 1;
+  text-align: center;
+  min-width: 100px;
 }
 .nav-btn.active {
   color: var(--secondary);
@@ -276,10 +359,106 @@ canvas {
   font-size: 0.9rem;
   z-index: 100;
   box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
-
 }
 
-/* ============= СТИЛИ ДЛЯ КАРТОЧЕК ШАГОВ ============= */
+/* ============= СТИЛИ ДЛЯ ГЛАВНОЙ СТРАНИЦЫ ============= */
+
+.home-body {
+  background: linear-gradient(135deg, #0f0f1a, #1a1a2e, #16213e);
+  background-attachment: fixed;
+}
+
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,204,0,0.1) 0%, transparent 70%);
+  animation: rotate 20s linear infinite;
+  z-index: -1;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.hero-content {
+  max-width: 800px;
+  padding: 40px;
+  background: rgba(26, 26, 46, 0.7);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,204,0,0.2);
+  margin: 0 auto;
+}
+
+.hero h1 {
+  font-size: 3.5rem;
+  background: linear-gradient(90deg, #ff3a5b, #ffcc00);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 20px;
+  text-shadow: 0 0 20px rgba(255, 204, 0, 0.3);
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: #ccc;
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 30px;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Инструкция */
+.section {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.how-to {
+  background: rgba(30, 30, 50, 0.5);
+}
+
+.how-to h2 {
+  font-size: 2.2rem;
+  color: var(--secondary);
+  margin-bottom: 50px;
+}
+
+.steps {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  max-width: 1000px;
+  margin: 0 auto;
+}
 
 .step-card {
   background: linear-gradient(135deg, #1a1a2e, #16213e);
@@ -339,67 +518,19 @@ canvas {
   line-height: 1.5;
 }
 
-/* ============= ЦЕНТРИРОВАНИЕ И НИЖНЕЕ МЕНЮ ============= */
-
-.hero {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-content {
-  max-width: 800px;
-  padding: 40px;
-  background: rgba(26, 26, 46, 0.7);
-  backdrop-filter: blur(10px);
-  border-radius: 24px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-  border: 1px solid rgba(255,204,0,0.2);
-  margin: 0 auto; /* Центрируем контейнер */
-}
-
-/* Нижнее меню — заполняет всю ширину */
-.bottom-nav {
-  display: flex;
-  justify-content: space-around;
-  padding: 15px 10px;
-  background: rgba(26, 26, 46, 0.95);
-  backdrop-filter: blur(10px);
-  position: fixed;
-  bottom: 0;
-  width: 100%; /* Занимает всю ширину */
-  max-width: 100%;
-  z-index: 1000;
-  border-top: 1px solid #333;
-}
-
-.nav-btn {
-  padding: 12px 24px; /* Больше отступов */
-  border-radius: 20px;
-  background: transparent;
-  color: #aaa;
-  border: none;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  flex: 1; /* Каждая кнопка занимает равную часть ширины */
-  text-align: center; /* Текст по центру */
-  min-width: 100px; /* Минимальная ширина */
-}
-
-.nav-btn.active {
-  color: var(--secondary);
-  background: rgba(255, 204, 0, 0.1);
-  font-weight: bold;
-}
-
-/* Адаптив: на маленьких экранах — больше кнопок */
+/* Адаптив */
 @media (max-width: 768px) {
+  .hero h1 {
+    font-size: 2.5rem;
+  }
+  .steps {
+    flex-direction: column;
+    align-items: center;
+  }
+  .step-card {
+    width: 100%;
+    max-width: 350px;
+  }
   .bottom-nav {
     padding: 10px 5px;
   }
@@ -407,60 +538,4 @@ canvas {
     padding: 10px 16px;
     font-size: 0.8rem;
   }
-}
-
-/* ============= БЫСТРЫЕ КНОПКИ ============= */
-
-.input-group {
-  display: flex;
-  gap: 10px;
-  margin: 20px 0;
-  flex-wrap: wrap;
-}
-
-.input-with-presets {
-  flex: 1;
-  min-width: 200px;
-  display: flex;
-  flex-direction: column;
-}
-
-.input-with-presets input {
-  padding: 12px;
-  border-radius: 12px 12px 0 0;
-  border: 2px solid #333;
-  background: #252535;
-  color: white;
-  font-size: 1rem;
-  text-align: center;
-  border-bottom: none;
-}
-
-.presets {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
-  background: #252535;
-  padding: 4px;
-  border-radius: 0 0 12px 12px;
-  border: 2px solid #333;
-  border-top: none;
-}
-
-.preset {
-  flex: 1;
-  min-width: 30px;
-  padding: 4px 2px;
-  font-size: 0.75rem;
-  background: #333;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.preset:hover {
-  background: #444;
-  transform: scale(1.05);
 }
