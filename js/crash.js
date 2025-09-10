@@ -2,12 +2,12 @@ let balance = parseFloat(localStorage.getItem('crashBalance')) || 1000;
 let gameInterval = null;
 let currentMultiplier = 1.00;
 let crashPoint = 0;
-let betAmount = 0;
 let isPlaying = false;
 let graphData = [];
 const maxGraphPoints = 50;
 
 let canvas, ctx, rocket, notification;
+let server;
 
 document.addEventListener('DOMContentLoaded', init);
 
@@ -24,12 +24,18 @@ function init() {
 
   // Подключаем события
   const addBalanceBtn = document.getElementById('addBalanceBtn');
-  const betButton = document.getElementById('betButton');
   const cashoutButton = document.getElementById('cashoutButton');
 
   if (addBalanceBtn) addBalanceBtn.addEventListener('click', addBalance);
-  if (betButton) betButton.addEventListener('click', startGame);
   if (cashoutButton) cashoutButton.addEventListener('click', manualCashout);
+
+  // Инициализация сервера
+  server = new ServerSim();
+  server.on('onRoundStart', handleRoundStart);
+  server.on('onRoundEnd', handleRoundEnd);
+  server.on('onCountdownTick', updateCountdownUI);
+
+  server.startCountdown();
 }
 
 function updateBalance() {
@@ -45,30 +51,17 @@ function addBalance() {
   updateBalance();
 }
 
-function startGame() {
-  if (isPlaying) return;
+function updateCountdownUI(seconds) {
+  const display = document.getElementById('countdownDisplay');
+  if (display) {
+    display.textContent = `🚀 Новый раунд через ${seconds} сек...`;
+  }
+}
 
-  const betInput = document.getElementById('betAmount');
-  const autoInput = document.getElementById('cashoutAt');
-
-  if (!betInput || !autoInput) return;
-
-  const bet = parseFloat(betInput.value);
-  const autoCashout = parseFloat(autoInput.value);
-
-  if (isNaN(bet) || bet <= 0) return alert("Введите ставку!");
-  if (isNaN(autoCashout) || autoCashout < 1.01) return alert("Коэф > 1.01!");
-  if (bet > balance) return alert("Недостаточно средств!");
-
-  balance -= bet;
-  betAmount = bet;
-  updateBalance();
-
-  crashPoint = 1 + Math.random() * (Math.random() > 0.7 ? 20 : 5);
-  console.log("💥 Крах на x" + crashPoint.toFixed(2));
-
+function handleRoundStart(round) {
   isPlaying = true;
   currentMultiplier = 1.00;
+  crashPoint = round.crashPoint;
   graphData = [{ x: 0, y: 1 }];
   resetRocket();
 
@@ -85,34 +78,34 @@ function startGame() {
     updateRocket();
     updateGraph();
 
-    if (currentMultiplier >= autoCashout) {
-      autoCashoutTrigger(autoCashout);
-    }
     if (currentMultiplier >= crashPoint) {
       crash();
     }
-  }, 150);
+  }, 325); // 325ms = 6.5 сек от 1x до 2x
+}
+
+function handleRoundEnd(round) {
+  isPlaying = false;
+  clearInterval(gameInterval);
+  const display = document.getElementById('countdownDisplay');
+  if (display) {
+    display.textContent = "💥 Раунд завершён! Следующий через 5 сек...";
+  }
 }
 
 function updateRocket() {
   if (!rocket || !canvas) return;
 
   const container = document.querySelector('.rocket-container');
-  const graphWidth = canvas.width; // Ширина графика
-  const graphHeight = canvas.height; // Высота графика
+  const graphWidth = canvas.width;
+  const graphHeight = canvas.height;
+  const maxVisibleY = Math.max(10, Math.ceil(crashPoint));
 
-  // Максимальный коэффициент для масштаба графика
-  const maxVisibleY = Math.max(5, Math.ceil(currentMultiplier));
-
-  // Позиция по X: пропорционально количеству точек
   const x = (graphData.length - 1) * (graphWidth / (maxGraphPoints - 1));
-
-  // Позиция по Y: как на графике, но инвертированная (вверх = меньше Y в CSS)
   const graphY = graphHeight - (currentMultiplier / maxVisibleY) * (graphHeight - 20);
   const rocketContainerHeight = container.clientHeight;
-  const y = rocketContainerHeight - graphY - 40; // 40 — высота/смещение ракеты
+  const y = rocketContainerHeight - graphY - 40;
 
-  // Устанавливаем позицию
   rocket.style.left = x + "px";
   rocket.style.bottom = y + "px";
 }
@@ -137,7 +130,7 @@ function drawGraph() {
 
   const w = canvas.width;
   const h = canvas.height;
-  const maxVisibleY = Math.max(10, Math.ceil(crashPoint)); // Фиксируем масштаб под точку краха
+  const maxVisibleY = Math.max(10, Math.ceil(crashPoint));
 
   ctx.clearRect(0, 0, w, h);
   ctx.strokeStyle = '#ffcc00';
@@ -153,10 +146,12 @@ function drawGraph() {
     else ctx.lineTo(x, y);
   }
   ctx.stroke();
+
+  // Текущий коэффициент на графике
   ctx.fillStyle = '#ffcc00';
-ctx.font = 'bold 16px Arial';
-ctx.textAlign = 'right';
-ctx.fillText(`x${currentMultiplier.toFixed(2)}`, w - 10, 25);
+  ctx.font = 'bold 16px Arial';
+  ctx.textAlign = 'right';
+  ctx.fillText(`x${currentMultiplier.toFixed(2)}`, w - 10, 25);
 }
 
 function resizeCanvas() {
@@ -184,30 +179,12 @@ function manualCashout() {
   endRound();
 }
 
-function autoCashoutTrigger(target) {
-  if (!isPlaying) return;
-
-  clearInterval(gameInterval);
-  isPlaying = false;
-
-  const win = betAmount * target;
-  balance += win;
-  updateBalance();
-  addToHistory(`+$${win.toFixed(2)} при x${target}`, true);
-
-  playSound('cashout');
-  showSuccessNotification();
-
-  endRound();
-}
-
 function crash() {
   if (!isPlaying) return;
 
   clearInterval(gameInterval);
   isPlaying = false;
 
-  // Анимация взрыва
   const container = document.querySelector('.rocket-container');
   if (container && rocket) {
     const explosion = document.createElement('div');
@@ -248,9 +225,9 @@ function showSuccessNotification() {
     notification.classList.remove('show');
     notification.classList.add('hide');
   }, 2500);
-
 }
 
+// Функции для быстрых кнопок
 function setBet(amount) {
   document.getElementById('betAmount').value = amount;
 }
