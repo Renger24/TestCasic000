@@ -1,4 +1,3 @@
-// Имитация мультиплеера — просто добавляем случайных игроков
 let playersList = [];
 
 function addPlayerEvent(playerName, cashout, isCrash = false) {
@@ -32,5 +31,4 @@ function simulatePlayers() {
   }, 3000);
 }
 
-// Запускаем имитацию при загрузке страницы
 document.addEventListener('DOMContentLoaded', simulatePlayers);
