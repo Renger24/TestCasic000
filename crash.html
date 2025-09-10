@@ -15,11 +15,16 @@
   <button id="addBalanceBtn">+100 💰</button>
 
   <div id="app">
-    <!-- Верх: ракета + график -->
+    <!-- Верх: таймер, ракета, график -->
     <div class="top-section">
+      <div class="countdown-timer">
+        <div id="countdownDisplay">Ожидание начала раунда...</div>
+      </div>
+
       <div class="rocket-container">
         <img id="rocket" src="assets/rocket.png" alt="Ракета" style="position: absolute; width: 40px; height: 80px;">
       </div>
+
       <div class="graph-container">
         <canvas id="graph"></canvas>
       </div>
@@ -29,32 +34,33 @@
     <div class="bottom-section">
       <div class="balance">Баланс: $<span id="balance">1000</span></div>
 
+      <!-- Ставка с пресетами -->
       <div class="input-group">
-  <div class="input-with-presets">
-    <input type="number" id="betAmount" placeholder="Ставка" min="1" value="10">
-    <div class="presets">
-      <button type="button" class="preset" onclick="setBet(10)">10</button>
-      <button type="button" class="preset" onclick="setBet(50)">50</button>
-      <button type="button" class="preset" onclick="setBet(100)">100</button>
-      <button type="button" class="preset" onclick="multiplyBet(2)">x2</button>
-      <button type="button" class="preset" onclick="divideBet(2)">/2</button>
-    </div>
-  </div>
+        <div class="input-with-presets">
+          <input type="number" id="betAmount" placeholder="Ставка" min="1" value="10">
+          <div class="presets">
+            <button type="button" class="preset" onclick="setBet(10)">10</button>
+            <button type="button" class="preset" onclick="setBet(50)">50</button>
+            <button type="button" class="preset" onclick="setBet(100)">100</button>
+            <button type="button" class="preset" onclick="multiplyBet(2)">x2</button>
+            <button type="button" class="preset" onclick="divideBet(2)">/2</button>
+          </div>
+        </div>
 
-  <!-- Автовывод с пресетами -->
-  <div class="input-with-presets">
-    <input type="number" id="cashoutAt" placeholder="Авто x" min="1.1" step="0.1" value="2.0">
-    <div class="presets">
-      <button type="button" class="preset" onclick="setCashout(2)">2x</button>
-      <button type="button" class="preset" onclick="setCashout(3)">3x</button>
-      <button type="button" class="preset" onclick="setCashout(5)">5x</button>
-      <button type="button" class="preset" onclick="setCashout(10)">10x</button>
-    </div>
-  </div>
-</div>
+        <!-- Автовывод с пресетами -->
+        <div class="input-with-presets">
+          <input type="number" id="cashoutAt" placeholder="Авто x" min="1.1" step="0.1" value="2.0">
+          <div class="presets">
+            <button type="button" class="preset" onclick="setCashout(2)">2x</button>
+            <button type="button" class="preset" onclick="setCashout(3)">3x</button>
+            <button type="button" class="preset" onclick="setCashout(5)">5x</button>
+            <button type="button" class="preset" onclick="setCashout(10)">10x</button>
+          </div>
+        </div>
+      </div>
 
       <div class="btn-row">
-        <button id="betButton" class="btn btn-primary">🚀 СТАРТ</button>
+        <button id="betButton" class="btn btn-primary" disabled>🚀 СТАРТ</button>
         <button id="cashoutButton" class="btn btn-success">💰 ЗАБРАТЬ</button>
       </div>
 
@@ -73,11 +79,12 @@
 
   <!-- Нижнее меню -->
   <div class="bottom-nav">
-    <button class="nav-btn" onclick="location.href='/'">Главная</button>
+    <button class="nav-btn" onclick="location.href='index.html'">Главная</button>
     <button class="nav-btn active">Crash</button>
   </div>
 
   <!-- Подключаем JS -->
+  <script src="js/server-sim.js"></script>
   <script src="js/sounds.js"></script>
   <script src="js/history.js"></script>
   <script src="js/multiplayer.js"></script>
