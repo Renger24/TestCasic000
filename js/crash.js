@@ -250,3 +250,21 @@ function showSuccessNotification() {
   }, 2500);
 
 }
+
+function setBet(amount) {
+  document.getElementById('betAmount').value = amount;
+}
+
+function multiplyBet(multiplier) {
+  const input = document.getElementById('betAmount');
+  input.value = parseFloat(input.value) * multiplier;
+}
+
+function divideBet(divider) {
+  const input = document.getElementById('betAmount');
+  input.value = parseFloat(input.value) / divider;
+}
+
+function setCashout(multiplier) {
+  document.getElementById('cashoutAt').value = multiplier;
+}
