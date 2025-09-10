@@ -7,7 +7,6 @@ function addToHistory(text, isWin) {
   item.textContent = text;
   historyList.prepend(item);
 
-  // Оставляем только последние 5 записей
   if (historyList.children.length > 5) {
     historyList.removeChild(historyList.lastChild);
   }
