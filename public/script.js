@@ -60,7 +60,7 @@ class CrashGame {
 
     connectToServer() {
         // Получаем URL сервера из текущего домена
-        const serverUrl = window.location.origin;
+        const serverUrl = 'https://your-railway-app.up.railway.app';
         this.socket = io(serverUrl);
         
         this.socket.on('connect', () => {
