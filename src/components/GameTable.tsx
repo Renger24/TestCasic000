@@ -1,5 +1,5 @@
 import React from 'react';
-import { GameState } from '../hooks/useBaccaratLogic.ts';
+import { GameState } from '../hooks/useBaccaratLogic.ts'; // Теперь GameState экспортируется
 
 interface GameTableProps {
   gameState: GameState;
@@ -29,7 +29,8 @@ const GameTable: React.FC<GameTableProps> = ({ gameState, winner }) => {
         <div className="text-center">
           <h2 className="text-xl font-bold">Player</h2>
           <div className="flex justify-center space-x-2 mt-2">
-            {playerCards.map((card, index) => (
+            {/* Добавлены типы Card для параметров map */}
+            {playerCards.map((card: string, index: number) => (
               <div
                 key={index}
                 className={`w-16 h-24 flex items-center justify-center text-2xl bg-white text-black rounded-lg shadow-lg ${
@@ -57,7 +58,8 @@ const GameTable: React.FC<GameTableProps> = ({ gameState, winner }) => {
         <div className="text-center">
           <h2 className="text-xl font-bold">Banker</h2>
           <div className="flex justify-center space-x-2 mt-2">
-            {bankerCards.map((card, index) => (
+            {/* Добавлены типы Card для параметров map */}
+            {bankerCards.map((card: string, index: number) => (
               <div
                 key={index}
                 className={`w-16 h-24 flex items-center justify-center text-2xl bg-white text-black rounded-lg shadow-lg ${
