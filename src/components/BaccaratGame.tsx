@@ -9,7 +9,7 @@ interface BaccaratGameProps {
 }
 
 const BaccaratGame: React.FC<BaccaratGameProps> = ({ webApp }) => {
-  const { gameState, balance, playRound, resetGame } = useBaccaratLogic(100); // Начальный демо-баланс
+  const { gameState, balance, playRound } = useBaccaratLogic(100); // Начальный демо-баланс
 
   useEffect(() => {
     // Установка начального размера окна Telegram Mini App
