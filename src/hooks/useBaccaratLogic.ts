@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react';
 import { createDeck, calculateScore, drawCard, Card } from '../lib/baccarat.ts';
 
-interface GameState {
+// Экспортируем интерфейс GameState, чтобы другие файлы могли его использовать
+export interface GameState {
   playerCards: string[];
   bankerCards: string[];
   playerScore: number;
@@ -106,6 +107,7 @@ const useBaccaratLogic = (initialBalance: number) => {
     });
   }, []);
 
+  // Возвращаем resetGame, даже если он не используется сейчас, для будущего расширения
   return { gameState, balance, playRound, resetGame };
 };
 
