@@ -1,10 +1,8 @@
-// Убран импорт React, так как он не используется напрямую в коде (JSX компилируется)
-// import React from 'react'; // <-- Удалите эту строку
 import BaccaratGame from './components/BaccaratGame.tsx';
 import useTelegramWebApp from './hooks/useTelegramWebApp.tsx';
 
 function App() {
-  // Убраны user и initData из деструктуризации, так как они не используются
+  // ВНИМАНИЕ: user и initData - ДОЛЖНЫ БЫТЬ УДАЛЕНЫ из деструктуризации
   const { webApp } = useTelegramWebApp();
 
   if (!webApp) {
