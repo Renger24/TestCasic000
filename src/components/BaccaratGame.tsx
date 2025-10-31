@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import useBaccaratLogic from '../hooks/useBaccaratLogic.ts';
-import BalanceDisplay from './BalanceDisplay.tsx';
+import BalanceDisplay from './BalanceDisplay.tsx'; // Правильный путь
 import BettingControls from './BettingControls.tsx';
 import GameTable from './GameTable.tsx';
 
