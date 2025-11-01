@@ -1,5 +1,5 @@
 import BaccaratGame from './components/BaccaratGame.tsx';
-import useTelegramWebApp from './hooks/useTelegramWebApp.tsx';
+import useTelegramWebApp from './hooks/useTelegramWebApp.ts';
 
 function App() {
   // ВНИМАНИЕ: user и initData - ДОЛЖНЫ БЫТЬ УДАЛЕНЫ из деструктуризации
