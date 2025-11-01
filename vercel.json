@@ -1,6 +1,6 @@
 {
-  "framework": "vite",  // Указывает Vercel, что это проект Vite
-  "headers": [          // Настройка заголовков безопасности
+  "framework": "vite",
+  "headers": [
     {
       "source": "/(.*)",
       "headers": [
